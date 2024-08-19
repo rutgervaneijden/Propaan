@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <style>
+        * { font-family: Arial, Helvetica, sans-serif; }
+        table {
+            border-spacing: 0;
+            text-align: right;
+        }
+        tr:nth-child(even) { background-color: lightgray;}
+    </style>
+    <body>
+        <h1>Propaan in bulk (&lt; 2000 liter)</h1>
+        <h2>Huidige prijs (tot {{ labels|last }})</h2>
+        {{ '%0.4f'|format(data|last) }} &euro; per liter inclusief BTW
+        <h2>Historiek</h2>
+        <div>
+            <canvas id="myChart"></canvas>
+        </div>
+        <script>
+            const labels = {{ labels|tojson }};
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Prijs per liter inclusief BTW',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: {{ data|tojson }},
+                }]
+            };
+            const config = {
+                type: 'line',
+                data: data,
+                options: { maintainAspectRatio: false }
+            };
+            const myChart = new Chart(
+                document.getElementById('myChart'),
+                config
+            );
+        </script>
+        <footer style="font-size: 0.75em;">
+            <b>Bron:</b>
+            Algemene Directie Energie - FOD Economie (via be.STAT)
+        </footer>
+        <h2>Vullingsbedragen</h2>
+        <table>
+            <th>liter</th>
+            <th style="padding-left: 1em;">bedrag inclusief BTW</th>
+            {% for l in [500, 750, 1000, 1250, 1500] %}
+                <tr>
+                    <td>{{ l }}</td>
+                    <td>{{ '%0.2f'|format(l * data|last) }} &euro;</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
